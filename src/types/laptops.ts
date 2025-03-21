@@ -20,7 +20,7 @@ export interface LaptopsResponse {
 
 export interface LaptopsTypeData {
   nombre: string;
-  precio: string;
+  precio: number;
   tipo: string;
   cantidad: number;
   total: number;

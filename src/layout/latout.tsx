@@ -9,14 +9,15 @@ import { Separator } from "@/components/ui/separator";
 import "@/index.css";
 import { ModeToggle } from "@/theme/mode-toggle";
 import { Breadcrumbs } from "@/components/bread-crumbs";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import ShoppingCart from "@/components/shopingcard";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { RiAdminFill } from "@remixicon/react";
 
 export default function RootLayout() {
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -25,6 +26,17 @@ export default function RootLayout() {
 
       if (!token || !user) {
         navigate("/login");
+        return;
+      }
+
+      // Verificar si es admin
+      try {
+        const userData = JSON.parse(user);
+        // Cambié de userData.isAdmin a userData.admin
+        setIsAdmin(userData.admin === true);
+      } catch (error) {
+        console.error("Error parsing user data", error);
+        setIsAdmin(false);
       }
     };
 
@@ -55,9 +67,22 @@ export default function RootLayout() {
               />
               <Breadcrumbs />
             </div>
-            <Link to="">
-              <RiAdminFill></RiAdminFill>
-            </Link>
+            {isAdmin && (
+              <NavLink
+                to="/admin"
+                className={({ isActive }) => `
+              flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors duration-200
+              ${
+                isActive
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-gray-200 dark:hover:bg-primary dark:hover:text-black"
+              }
+            `}
+              >
+                <RiAdminFill />
+                Administración
+              </NavLink>
+            )}
             <ModeToggle />
             <ShoppingCart onCheckout={() => {}} />
           </header>

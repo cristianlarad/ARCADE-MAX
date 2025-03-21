@@ -1,3 +1,4 @@
+import AdminPage from "@/pages/admin/adminPage";
 import { NavSection } from "@/types/navigation";
 import { RiComputerLine, RiPhoneFindLine } from "@remixicon/react";
 import { Laptop2, ShoppingBag } from "lucide-react";
@@ -28,6 +29,13 @@ export const navMain: NavSection[] = [
             <Inicio />
           </Suspense>
         ),
+        routes: [
+          {
+            path: "/admin/*",
+            element: <AdminPage />,
+            title: "Admin",
+          },
+        ],
       },
     ],
   },
