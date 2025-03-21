@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { usePost } from "@/hooks/usePost";
-import { toast } from "react-hot-toast";
+import { toast, Toaster } from "react-hot-toast";
 import {
   Form,
   FormControl,
@@ -55,8 +55,19 @@ export default function Register() {
       toast.success(data.message || "Registro exitoso");
       navigate("/login");
     },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || "Error al registrarse");
+    onError: (error: any) => {
+      // Depuración detallada
+      console.error("Error completo:", error);
+      console.error("Error response:", error.response);
+      console.error("Error data:", error.response?.data);
+
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message ||
+        "Error al registrarse";
+
+      toast.error(errorMessage, {});
     },
   });
 

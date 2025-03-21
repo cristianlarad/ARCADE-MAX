@@ -100,7 +100,7 @@ export function ShoppingCart({ onCheckout }: ShoppingCartProps) {
   // Prepare the data for the POST request
   const orderData: LaptopsTypeData[] = items.map((item) => ({
     nombre: item.nombre,
-    precio: item.precio,
+    precio: Number.parseFloat(item.precio.replace(/[\D.]/g, "")),
     cantidad: item.quantity,
     tipo: item.tipo,
     total: item.quantity * Number.parseFloat(item.precio.replace(/[\D.]/g, "")),

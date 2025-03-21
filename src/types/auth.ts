@@ -18,6 +18,9 @@ export interface IUser {
   name: string;
   email: string;
   admin: boolean;
+  last_login: Date;
+  login_count: number;
+  banned: boolean;
 }
 
 export interface IUserData {
