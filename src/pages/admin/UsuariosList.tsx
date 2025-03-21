@@ -1,8 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/ui/DataTable";
+import ExportUsers from "@/components/ui/exportUsers";
+import BannerUser from "@/components/users/BannerUser";
 import { useGet } from "@/hooks/useGet";
 import { IUser, IUserData } from "@/types/auth";
-import { ColumnDef } from "@tanstack/react-table";
+import FormattedDate from "@/utils/FormatDate";
+import { ColumnDef, Table } from "@tanstack/react-table";
 
 const UsuariosList = () => {
   const { data, isLoading } = useGet<IUserData>({
@@ -31,6 +34,30 @@ const UsuariosList = () => {
         </Badge>
       ),
     },
+    {
+      accessorKey: "last_login",
+      header: "Ultimo Login",
+      cell: ({ row }) =>
+        row.original.last_login.toString() == "0001-01-01T00:00:00Z" ? (
+          "No ha hecho login"
+        ) : (
+          <FormattedDate dateString={row.original.last_login} />
+        ),
+    },
+    {
+      accessorKey: "login_count",
+      header: "Cant. de Logins",
+      cell: ({ row }) => row.original.login_count,
+    },
+    {
+      accessorKey: "banned",
+      header: "Baneado",
+      cell: ({ row }) => (
+        <Badge variant={row.original.banned ? "destructive" : "outline"}>
+          {row.original.banned ? "Baneado" : "No baneado"}
+        </Badge>
+      ),
+    },
   ];
 
   return (
@@ -43,6 +70,13 @@ const UsuariosList = () => {
         filterColumn="email"
         filterPlaceholder="Buscar por email"
         isLoading={isLoading}
+        children={(table: Table<IUser>) => {
+          const selectedRows = table.getSelectedRowModel().rows;
+          return selectedRows.length > 0 ? (
+            <BannerUser userIds={selectedRows.map((row) => row.original.id)} />
+          ) : null;
+        }}
+        childrenRight={<ExportUsers />}
       />
     </div>
   );

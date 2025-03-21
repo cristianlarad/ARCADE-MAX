@@ -13,6 +13,7 @@ import {
   useReactTable,
   VisibilityState,
   RowSelectionState,
+  Table as tablerow,
 } from "@tanstack/react-table";
 
 import {
@@ -45,9 +46,6 @@ import {
   Search,
   X,
   SlidersHorizontal,
-  Download,
-  FileSpreadsheet,
-  FileText,
   Loader2,
   Users,
   Filter,
@@ -66,6 +64,8 @@ interface DataTableProps<TData, TValue> {
   filterColumn?: string;
   filterPlaceholder?: string;
   isLoading?: boolean;
+  children?: (table: tablerow<TData>) => React.ReactNode;
+  childrenRight?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
@@ -76,6 +76,8 @@ export function DataTable<TData, TValue>({
   filterColumn = "email",
   filterPlaceholder = "Filter emails...",
   isLoading = false,
+  childrenRight,
+  children,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -242,6 +244,9 @@ export function DataTable<TData, TValue>({
                   </button>
                 )}
               </div>
+              {children && typeof children === "function"
+                ? children(table)
+                : children}
               <div className="flex items-center gap-2 flex-wrap justify-end">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -272,26 +277,7 @@ export function DataTable<TData, TValue>({
                       })}
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-9 gap-1">
-                      <Download className="h-3.5 w-3.5" />
-                      <span>Export</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuLabel>Export Options</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuCheckboxItem className="cursor-pointer">
-                      <FileSpreadsheet className="mr-2 h-4 w-4" />
-                      <span>Excel</span>
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem className="cursor-pointer">
-                      <FileText className="mr-2 h-4 w-4" />
-                      <span>CSV</span>
-                    </DropdownMenuCheckboxItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                {childrenRight}
                 <Button variant="outline" size="sm" className="h-9 gap-1">
                   <Filter className="h-3.5 w-3.5" />
                   <span>Filter</span>

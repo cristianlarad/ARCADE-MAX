@@ -67,10 +67,7 @@ export default function Register() {
         error.message ||
         "Error al registrarse";
 
-      toast.error(errorMessage, {
-        duration: 4000,
-        position: "top-right",
-      });
+      toast.error(errorMessage, {});
     },
   });
 
@@ -85,7 +82,6 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <Toaster />
       <Card className="w-full max-w-md">
         <CardHeader>
           <h2 className="text-2xl font-bold text-center">Registro</h2>
