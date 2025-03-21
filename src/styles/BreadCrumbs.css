@@ -1,0 +1,42 @@
+/* Estilos adicionales para las migas de pan */
+.breadcrumb-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.breadcrumb-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(59, 130, 246, 0.2) 0%,
+    transparent 70%
+  );
+  filter: blur(10px);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.breadcrumb-item:hover .breadcrumb-glow {
+  opacity: 1;
+}
+
+.breadcrumb-active-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, #3b82f6, #2563eb);
+  transform-origin: left;
+}
+
+.breadcrumb-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #3b82f6;
+  pointer-events: none;
+}
