@@ -2,7 +2,6 @@ import { NavSection } from "@/types/navigation";
 import { RiComputerLine, RiPhoneFindLine } from "@remixicon/react";
 import { Laptop2, ShoppingBag } from "lucide-react";
 import React, { Suspense, lazy } from "react";
-import { Navigate } from "react-router-dom";
 
 const LoadingComponent = React.lazy(() => import("@/pages/LoadingPage"));
 const Login = lazy(() => import("@/pages/Auth/Login"));
@@ -15,17 +14,6 @@ const PedidosStatus = React.lazy(
 );
 
 const Inicio = React.lazy(() => import("@/pages/products/Inicio"));
-
-const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const userString = localStorage.getItem("user");
-  const user = userString ? JSON.parse(userString) : null;
-
-  if (!user?.admin) {
-    return <Navigate to="/productos/laptops" replace />;
-  }
-
-  return <>{children}</>;
-};
 
 export const navMain: NavSection[] = [
   {
@@ -41,26 +29,6 @@ export const navMain: NavSection[] = [
           </Suspense>
         ),
       },
-      ...(() => {
-        const userString = localStorage.getItem("user");
-        const user = userString ? JSON.parse(userString) : null;
-        return user?.admin
-          ? [
-              {
-                title: "Admin",
-                path: "/admin",
-                icon: Laptop2,
-                element: (
-                  <AdminRoute>
-                    <Suspense fallback={<LoadingComponent />}>
-                      <h1>Admin Dashboard</h1>
-                    </Suspense>
-                  </AdminRoute>
-                ),
-              },
-            ]
-          : [];
-      })(),
     ],
   },
   {

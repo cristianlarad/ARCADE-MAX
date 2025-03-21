@@ -9,10 +9,11 @@ import { Separator } from "@/components/ui/separator";
 import "@/index.css";
 import { ModeToggle } from "@/theme/mode-toggle";
 import { Breadcrumbs } from "@/components/bread-crumbs";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import ShoppingCart from "@/components/shopingcard";
 import { useEffect } from "react";
+import { RiAdminFill } from "@remixicon/react";
 
 export default function RootLayout() {
   const navigate = useNavigate();
@@ -54,6 +55,9 @@ export default function RootLayout() {
               />
               <Breadcrumbs />
             </div>
+            <Link to="">
+              <RiAdminFill></RiAdminFill>
+            </Link>
             <ModeToggle />
             <ShoppingCart onCheckout={() => {}} />
           </header>
