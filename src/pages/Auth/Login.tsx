@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { APIError } from "@/types/api";
 
 const loginSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -28,14 +29,18 @@ type LoginResponse = {
     id: string;
     email: string;
     name: string;
+    admin: boolean;
   };
 };
+
+type LoginData = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
-  const form = useForm<z.infer<typeof loginSchema>>({
+  const form = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
@@ -43,23 +48,42 @@ export default function Login() {
     },
   });
 
-  const { mutate: login, isPending } = usePost<
-    LoginResponse,
-    z.infer<typeof loginSchema>
-  >({
+  const { mutate: login, isPending } = usePost<LoginResponse, LoginData>({
     url: "/login",
     onSuccess: (data) => {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      // Limpiar cualquier error previo
+      setLoginError(null);
       toast.success("Inicio de sesión exitoso");
-      navigate("/productos/laptops");
+
+      // Guardar token y usuario
+      localStorage.setItem("token", data.token);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          id: data.user.id,
+          email: data.user.email,
+          name: data.user.name,
+          admin: data.user.admin,
+        })
+      );
+
+      navigate("/");
     },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || "Error al iniciar sesión");
+    onError: (error: APIError) => {
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message ||
+        "Error al iniciar sesión";
+
+      // Establecer el mensaje de error
+      setLoginError(errorMessage);
     },
   });
 
-  const onSubmit = (data: z.infer<typeof loginSchema>) => {
+  const onSubmit = (data: LoginData) => {
+    // Limpiar error anterior antes de intentar iniciar sesión
+    setLoginError(null);
     login(data);
   };
 
@@ -118,6 +142,15 @@ export default function Login() {
                   </FormItem>
                 )}
               />
+
+              {/* Mostrar mensaje de error */}
+              {loginError && (
+                <div className="text-red-500 text-sm text-center grid">
+                  <span>{loginError}</span>
+                  <br />
+                  Póngase en contacto con el soporte técnico
+                </div>
+              )}
 
               <div className="space-y-4">
                 <Button type="submit" className="w-full" disabled={isPending}>
