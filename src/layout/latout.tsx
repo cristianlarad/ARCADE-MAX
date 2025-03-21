@@ -69,7 +69,7 @@ export default function RootLayout() {
             </div>
             {isAdmin && (
               <NavLink
-                to="/admin"
+                to="/admin/dashboard"
                 className={({ isActive }) => `
               flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors duration-200
               ${

@@ -12,7 +12,7 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import { format, parseISO, subDays } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import {
   Card,

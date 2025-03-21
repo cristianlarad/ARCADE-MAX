@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import AdminLayout from "@/layout/adminLayout";
 import { LayoutDashboard, ShoppingCart, Users, Settings } from "lucide-react";
 import Dashboard from "./Dashboard";
+import UsuariosList from "./UsuariosList";
 
 const adminRoutes = [
   {
@@ -14,13 +15,13 @@ const adminRoutes = [
     path: "pedidos",
     label: "Pedidos",
     icon: ShoppingCart,
-    element: <h1>Lista de Pedidos</h1>,
+    element: <div>Pedidos</div>,
   },
   {
     path: "usuarios",
     label: "Usuarios",
     icon: Users,
-    element: <h1>Gestión de Usuarios</h1>,
+    element: <UsuariosList />,
   },
   {
     path: "configuracion",
