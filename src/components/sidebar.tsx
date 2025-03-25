@@ -39,7 +39,7 @@ const data = {
   teams: [
     {
       name: "ARCADE MAX",
-      logo: "../../public/LogoSize/logo_size_invert.jpg",
+      logo: "../../public/arcade-max.ico",
     },
   ],
 };
