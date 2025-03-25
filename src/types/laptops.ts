@@ -11,6 +11,7 @@ export interface LaptopsType {
   precio: string;
   inStock: boolean;
   tipo: string;
+  image: string;
 }
 
 export interface LaptopsResponse {

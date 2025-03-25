@@ -1,11 +1,10 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import { Outlet, useNavigate, NavLink, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { LayoutDashboard, ShoppingCart, Users, Settings } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ParticleEffect } from "@/components/particleEffect";
+import { RiProductHuntLine } from "@remixicon/react";
 
 interface AdminLayoutProps {
   children?: React.ReactNode;
@@ -56,9 +55,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       label: "Usuarios",
     },
     {
-      path: "/admin/configuracion",
-      icon: Settings,
-      label: "Configuración",
+      path: "/admin/producto",
+      icon: RiProductHuntLine,
+      label: "Producto",
     },
   ];
 

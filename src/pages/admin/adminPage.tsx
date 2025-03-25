@@ -1,8 +1,10 @@
 import { Route, Routes } from "react-router-dom";
 import AdminLayout from "@/layout/adminLayout";
-import { LayoutDashboard, ShoppingCart, Users, Settings } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, Users } from "lucide-react";
 import Dashboard from "./Dashboard";
 import UsuariosList from "./UsuariosList";
+import CreateProducto from "./CreateProducto";
+import { RiProductHuntLine } from "@remixicon/react";
 
 const adminRoutes = [
   {
@@ -24,10 +26,10 @@ const adminRoutes = [
     element: <UsuariosList />,
   },
   {
-    path: "configuracion",
-    label: "Configuración",
-    icon: Settings,
-    element: <h1>Configuración del Sistema</h1>,
+    path: "producto",
+    label: "Producto",
+    icon: RiProductHuntLine,
+    element: <CreateProducto />,
   },
 ];
 
