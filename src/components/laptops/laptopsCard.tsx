@@ -32,7 +32,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { LaptopsType } from "@/types/laptops";
+import type { LaptopsType } from "@/types/laptops";
 
 interface LaptopCardProps {
   laptop: LaptopsType;
@@ -154,27 +154,38 @@ export function LaptopCard({ laptop, onAddToCart }: LaptopCardProps) {
         </Badge>
       </div>
 
-      {/* Imagen del producto (simulada) */}
-      <div className="relative pt-8 px-4 flex justify-center items-center h-48 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 overflow-hidden">
+      {/* Imagen del producto (ocupando todo el espacio) */}
+      <div className="relative flex justify-center items-center h-48 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 overflow-hidden p-0">
         <motion.div
-          className="w-full h-full flex items-center justify-center"
-          initial={{ scale: 0.9, y: 10 }}
+          className="absolute inset-0 w-full h-full"
+          initial={{ scale: 0.98 }}
           animate={{
-            scale: isHovered ? 1.05 : 1,
-            y: isHovered ? 0 : 10,
+            scale: isHovered ? 1.02 : 0.98,
           }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
         >
-          {/* Imagen simulada con un rectángulo */}
-          <div className="w-40 h-32 bg-gradient-to-br from-gray-200 to-white dark:from-gray-700 dark:to-gray-800 rounded-md shadow-md flex items-center justify-center">
-            <span className="text-2xl font-bold text-primary/40">
-              {laptop.nombre.split(" ")[0]}
-            </span>
-          </div>
+          {laptop.imageURL ? (
+            <img
+              src={laptop.imageURL || "/placeholder.svg"}
+              alt={laptop.nombre}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 p-4">
+              <div className="text-center">
+                <div className="text-lg font-semibold text-amber-600 dark:text-amber-400 line-clamp-3">
+                  {laptop.nombre}
+                </div>
+                <div className="text-xs text-amber-500/70 dark:text-amber-400/70 mt-1">
+                  {laptop.procesador}
+                </div>
+              </div>
+            </div>
+          )}
         </motion.div>
 
         {/* Botones de acción flotantes */}
-        <div className="absolute top-2 right-2 flex flex-col gap-2">
+        <div className="absolute top-2 right-2 z-10 flex flex-col gap-2">
           <motion.button
             className={cn(
               "w-8 h-8 rounded-full flex items-center justify-center bg-white shadow-md",

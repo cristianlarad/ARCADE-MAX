@@ -4,7 +4,6 @@ import type React from "react";
 import { useState } from "react";
 import type { LaptopsType } from "../../types/laptops";
 import { usePost } from "@/hooks/usePost";
-import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -17,20 +16,78 @@ import {
   DollarSign,
   CheckCircle,
   XCircle,
+  Upload,
+  Laptop,
+  Smartphone,
+  ComputerIcon as Desktop,
+  Usb,
+  Tv2,
+  Headphones,
+  Wifi,
+  NetworkIcon as Ethernet,
 } from "lucide-react";
+
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import toast from "react-hot-toast";
+
+const PUERTOS_OPTIONS = [
+  { value: "USB", icon: <Usb className="w-3.5 h-3.5 mr-1.5" /> },
+  { value: "HDMI", icon: <Tv2 className="w-3.5 h-3.5 mr-1.5" /> },
+  { value: "Thunderbolt", icon: <Usb className="w-3.5 h-3.5 mr-1.5" /> },
+  { value: "Jack 3.5mm", icon: <Headphones className="w-3.5 h-3.5 mr-1.5" /> },
+  { value: "Ethernet", icon: <Ethernet className="w-3.5 h-3.5 mr-1.5" /> },
+  { value: "Wi-Fi", icon: <Wifi className="w-3.5 h-3.5 mr-1.5" /> },
+];
+
+const TIPOS_PRODUCTO = [
+  {
+    value: "laptop",
+    label: "Laptop",
+    icon: <Laptop className="w-4 h-4 mr-2" />,
+  },
+  {
+    value: "teléfono",
+    label: "Teléfono",
+    icon: <Smartphone className="w-4 h-4 mr-2" />,
+  },
+  {
+    value: "escritorio",
+    label: "Escritorio",
+    icon: <Desktop className="w-4 h-4 mr-2" />,
+  },
+];
 
 const CreateProducto: React.FC = () => {
   const [producto, setProducto] = useState<Partial<LaptopsType>>({
     inStock: true,
     tipo: "laptop",
+    puertos: [],
   });
   const navigate = useNavigate();
   const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      setImage(selectedFile);
+      setImagePreview(URL.createObjectURL(selectedFile));
     }
   };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -50,17 +107,23 @@ const CreateProducto: React.FC = () => {
     }
   };
 
-  const handlePuertosChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = e.target;
+  const handleSelectChange = (name: string, value: string) => {
+    setProducto((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handlePuertosChange = (puerto: string) => {
     setProducto((prev) => {
       const currentPuertos = prev.puertos || [];
-      if (checked) {
-        return { ...prev, puertos: [...currentPuertos, value] };
-      } else {
+      if (currentPuertos.includes(puerto)) {
         return {
           ...prev,
-          puertos: currentPuertos.filter((puerto) => puerto !== value),
+          puertos: currentPuertos.filter((p) => p !== puerto),
         };
+      } else {
+        return { ...prev, puertos: [...currentPuertos, puerto] };
       }
     });
   };
@@ -132,415 +195,357 @@ const CreateProducto: React.FC = () => {
 
   const buttonVariants = {
     initial: { scale: 1 },
-    hover: { scale: 1.05, backgroundColor: "#2563eb" },
-    tap: { scale: 0.95 },
-  };
-
-  const checkboxVariants = {
-    checked: { scale: 1.1 },
-    unchecked: { scale: 1 },
+    hover: { scale: 1.02, backgroundColor: "#2563eb" },
+    tap: { scale: 0.98 },
   };
 
   return (
     <motion.div
-      className="max-w-4xl mx-auto p-8  rounded-xl shadow-lg"
+      className="max-w-5xl"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <motion.h2
-        className="text-3xl font-bold mb-8 text-gray-800 dark:text-white text-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
-        Crear Nuevo Producto (Laptop)
-      </motion.h2>
-
-      <motion.form
-        onSubmit={handleSubmit}
-        className="space-y-6"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <motion.div className="space-y-2" variants={itemVariants}>
-          <label
-            htmlFor="image"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+      <Card className="border shadow-lg  ">
+        <CardHeader className="bg-amber-500 border mx-4 p-4 text-white rounded-lg">
+          <CardTitle className="text-2xl md:text-3xl font-bold text-center">
+            Crear Nuevo Producto
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <motion.form
+            onSubmit={handleSubmit}
+            className="space-y-8"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
           >
-            Imagen del Producto
-          </label>
-          <input
-            type="file"
-            id="image"
-            name="image"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg"
-          />
-          {image && (
-            <div className="mt-2">
-              <img
-                src={URL.createObjectURL(image)}
-                alt="Vista previa"
-                className="max-w-full h-auto rounded-lg"
-              />
-            </div>
-          )}
-        </motion.div>
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          variants={itemVariants}
-        >
-          <div className="space-y-2">
-            <label
-              htmlFor="nombre"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Nombre
-            </label>
-            <motion.input
-              whileFocus={{
-                scale: 1.01,
-                boxShadow: "0 0 0 2px rgba(59, 130, 246, 0.5)",
-              }}
-              type="text"
-              id="nombre"
-              name="nombre"
-              value={producto.nombre || ""}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              required
-            />
-          </div>
+            {/* Imagen del producto */}
+            <motion.div variants={itemVariants} className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Upload className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-semibold">Imagen del Producto</h3>
+              </div>
+              <Separator />
 
-          <div className="space-y-2">
-            <label
-              htmlFor="procesador"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
-            >
-              <Cpu className="w-4 h-4" /> Procesador
-            </label>
-            <motion.input
-              whileFocus={{
-                scale: 1.01,
-                boxShadow: "0 0 0 2px rgba(59, 130, 246, 0.5)",
-              }}
-              type="text"
-              id="procesador"
-              name="procesador"
-              value={producto.procesador || ""}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg  text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              required
-            />
-          </div>
-        </motion.div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                <div className="space-y-4">
+                  <Label htmlFor="image" className="text-sm font-medium">
+                    Seleccionar imagen
+                  </Label>
+                  <div className="flex items-center justify-center w-full">
+                    <Label
+                      htmlFor="image"
+                      className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer  transition-colors"
+                    >
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <Upload className="w-8 h-8 mb-2 text-gray-500 dark:text-gray-400" />
+                        <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                          <span className="font-semibold">
+                            Haz clic para subir
+                          </span>{" "}
+                          o arrastra y suelta
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          PNG, JPG o WEBP (MAX. 2MB)
+                        </p>
+                      </div>
+                      <Input
+                        id="image"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
+                    </Label>
+                  </div>
+                </div>
 
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          variants={itemVariants}
-        >
-          <div className="space-y-2">
-            <label
-              htmlFor="memoria_RAM"
-              className=" text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
-            >
-              <Server className="w-4 h-4" /> Memoria RAM
-            </label>
-            <motion.input
-              whileFocus={{
-                scale: 1.01,
-                boxShadow: "0 0 0 2px rgba(59, 130, 246, 0.5)",
-              }}
-              type="text"
-              id="memoria_RAM"
-              name="memoria_RAM"
-              value={producto.memoria_RAM || ""}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg  text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="almacenamiento"
-              className=" text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
-            >
-              <HardDrive className="w-4 h-4" /> Almacenamiento
-            </label>
-            <motion.input
-              whileFocus={{
-                scale: 1.01,
-                boxShadow: "0 0 0 2px rgba(59, 130, 246, 0.5)",
-              }}
-              type="text"
-              id="almacenamiento"
-              name="almacenamiento"
-              value={producto.almacenamiento || ""}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg  text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              required
-            />
-          </div>
-        </motion.div>
-
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          variants={itemVariants}
-        >
-          <div className="space-y-2">
-            <label
-              htmlFor="pantalla"
-              className=" text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
-            >
-              <Monitor className="w-4 h-4" /> Pantalla
-            </label>
-            <motion.input
-              whileFocus={{
-                scale: 1.01,
-                boxShadow: "0 0 0 2px rgba(59, 130, 246, 0.5)",
-              }}
-              type="text"
-              id="pantalla"
-              name="pantalla"
-              value={producto.pantalla || ""}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg  text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="peso"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
-            >
-              <Weight className="w-4 h-4" /> Peso
-            </label>
-            <motion.input
-              whileFocus={{
-                scale: 1.01,
-                boxShadow: "0 0 0 2px rgba(59, 130, 246, 0.5)",
-              }}
-              type="text"
-              id="peso"
-              name="peso"
-              value={producto.peso || ""}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg  text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              required
-            />
-          </div>
-        </motion.div>
-
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          variants={itemVariants}
-        >
-          <div className="space-y-2">
-            <label
-              htmlFor="tipo"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Tipo de Producto
-            </label>
-            <motion.select
-              whileFocus={{
-                scale: 1.01,
-                boxShadow: "0 0 0 2px rgba(59, 130, 246, 0.5)",
-              }}
-              id="tipo"
-              name="tipo"
-              value={producto.tipo || "laptop"}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg  text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              required
-            >
-              <option className="bg-primary" value="laptop">
-                Laptop
-              </option>
-              <option value="teléfono">Teléfono</option>
-              <option value="escritorio">Escritorio</option>
-            </motion.select>
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="inStock"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
-            >
-              Disponibilidad
-            </label>
-            <div className="flex items-center space-x-3">
-              <motion.div
-                variants={checkboxVariants}
-                animate={producto.inStock ? "checked" : "unchecked"}
-                className="relative"
-              >
-                <input
-                  type="checkbox"
-                  id="inStock"
-                  name="inStock"
-                  checked={producto.inStock || false}
-                  onChange={handleChange}
-                  className="sr-only"
-                />
-                <motion.div
-                  className={`w-12 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ease-in-out ${
-                    producto.inStock
-                      ? "bg-green-500"
-                      : "bg-gray-300 dark:bg-gray-600"
-                  }`}
-                  onClick={() =>
-                    setProducto((prev) => ({ ...prev, inStock: !prev.inStock }))
-                  }
-                >
-                  <motion.div
-                    className="bg-white w-4 h-4 rounded-full shadow-md"
-                    animate={{ x: producto.inStock ? 24 : 0 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  />
-                </motion.div>
-              </motion.div>
-              <span className="flex items-center gap-1 text-sm">
-                {producto.inStock ? (
-                  <>
-                    <CheckCircle className="w-4 h-4 text-green-500" /> En Stock
-                  </>
-                ) : (
-                  <>
-                    <XCircle className="w-4 h-4 text-red-500" /> Agotado
-                  </>
+                {imagePreview && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Vista previa</Label>
+                    <div className="relative border rounded-lg overflow-hidden aspect-video ">
+                      <img
+                        src={imagePreview || "/placeholder.svg"}
+                        alt="Vista previa"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  </div>
                 )}
-              </span>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div variants={itemVariants} className="space-y-3">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Puertos
-          </label>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            {["USB", "HDMI", "Thunderbolt", "Jack 3.5mm", "Ethernet"].map(
-              (puerto) => (
-                <motion.label
-                  key={puerto}
-                  className={`flex items-center justify-center p-3 border rounded-lg cursor-pointer transition-all duration-200 ${
-                    (producto.puertos || []).includes(puerto)
-                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                      : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
-                  }`}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  <input
-                    type="checkbox"
-                    name="puertos"
-                    value={puerto}
-                    checked={(producto.puertos || []).includes(puerto)}
-                    onChange={handlePuertosChange}
-                    className="sr-only"
-                  />
-                  <motion.span
-                    animate={{
-                      scale: (producto.puertos || []).includes(puerto)
-                        ? 1.05
-                        : 1,
-                    }}
-                    transition={{ type: "spring", stiffness: 300, damping: 10 }}
-                  >
-                    {puerto}
-                  </motion.span>
-                </motion.label>
-              )
-            )}
-          </div>
-        </motion.div>
-
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          variants={itemVariants}
-        >
-          <div className="space-y-2">
-            <label
-              htmlFor="batería"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
-            >
-              <Battery className="w-4 h-4" /> Batería
-            </label>
-            <motion.input
-              whileFocus={{
-                scale: 1.01,
-                boxShadow: "0 0 0 2px rgba(59, 130, 246, 0.5)",
-              }}
-              type="text"
-              id="batería"
-              name="batería"
-              value={producto.batería || ""}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="precio"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
-            >
-              <DollarSign className="w-4 h-4" /> Precio
-            </label>
-            <motion.input
-              whileFocus={{
-                scale: 1.01,
-                boxShadow: "0 0 0 2px rgba(59, 130, 246, 0.5)",
-              }}
-              type="text"
-              id="precio"
-              name="precio"
-              value={producto.precio || ""}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              required
-            />
-          </div>
-        </motion.div>
-
-        <motion.button
-          type="submit"
-          className="w-full bg-blue-500 text-white p-3 rounded-lg font-medium text-lg shadow-md hover:bg-blue-600 transition-all duration-200 flex items-center justify-center"
-          variants={buttonVariants}
-          initial="initial"
-          whileHover="hover"
-          whileTap="tap"
-          disabled={isPending}
-        >
-          {isPending ? (
-            <motion.div
-              className="flex items-center gap-2"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <motion.div
-                className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                animate={{ rotate: 360 }}
-                transition={{
-                  duration: 1,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "linear",
-                }}
-              />
-              <span>Creando...</span>
+              </div>
             </motion.div>
-          ) : (
-            "Crear Producto"
-          )}
-        </motion.button>
-      </motion.form>
+
+            {/* Información básica */}
+            <motion.div variants={itemVariants} className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Laptop className="w-5 h-5 text-blue-500" />
+                <h3 className="text-lg font-semibold">Información Básica</h3>
+              </div>
+              <Separator />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="nombre">Nombre del Producto</Label>
+                  <Input
+                    id="nombre"
+                    name="nombre"
+                    value={producto.nombre || ""}
+                    onChange={handleChange}
+                    placeholder="Ej: MacBook Pro 16 2023"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="precio">
+                    <div className="flex items-center gap-1.5">
+                      <DollarSign className="w-4 h-4 text-green-600" /> Precio
+                    </div>
+                  </Label>
+                  <Input
+                    id="precio"
+                    name="precio"
+                    value={producto.precio || ""}
+                    onChange={handleChange}
+                    placeholder="Ej: 1299.99"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="tipo">Tipo de Producto</Label>
+                  <Select
+                    value={producto.tipo || "laptop"}
+                    onValueChange={(value) => handleSelectChange("tipo", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona un tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {TIPOS_PRODUCTO.map((tipo) => (
+                        <SelectItem key={tipo.value} value={tipo.value}>
+                          <div className="flex items-center">
+                            {tipo.icon}
+                            {tipo.label}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Disponibilidad</Label>
+                  <div className="flex items-center justify-between p-3 border rounded-md ">
+                    <div className="flex items-center gap-2">
+                      {producto.inStock ? (
+                        <CheckCircle className="w-5 h-5 text-green-500" />
+                      ) : (
+                        <XCircle className="w-5 h-5 text-red-500" />
+                      )}
+                      <span>{producto.inStock ? "En Stock" : "Agotado"}</span>
+                    </div>
+                    <Switch
+                      checked={producto.inStock || false}
+                      onCheckedChange={(checked) =>
+                        setProducto((prev) => ({ ...prev, inStock: checked }))
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Especificaciones técnicas */}
+            <motion.div variants={itemVariants} className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Cpu className="w-5 h-5 text-blue-500" />
+                <h3 className="text-lg font-semibold">
+                  Especificaciones Técnicas
+                </h3>
+              </div>
+              <Separator />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="procesador">
+                    <div className="flex items-center gap-1.5">
+                      <Cpu className="w-4 h-4 text-purple-600" /> Procesador
+                    </div>
+                  </Label>
+                  <Input
+                    id="procesador"
+                    name="procesador"
+                    value={producto.procesador || ""}
+                    onChange={handleChange}
+                    placeholder="Ej: Intel Core i7-12700H"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="memoria_RAM">
+                    <div className="flex items-center gap-1.5">
+                      <Server className="w-4 h-4 text-blue-600" /> Memoria RAM
+                    </div>
+                  </Label>
+                  <Input
+                    id="memoria_RAM"
+                    name="memoria_RAM"
+                    value={producto.memoria_RAM || ""}
+                    onChange={handleChange}
+                    placeholder="Ej: 16GB DDR5"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="almacenamiento">
+                    <div className="flex items-center gap-1.5">
+                      <HardDrive className="w-4 h-4 text-amber-600" />{" "}
+                      Almacenamiento
+                    </div>
+                  </Label>
+                  <Input
+                    id="almacenamiento"
+                    name="almacenamiento"
+                    value={producto.almacenamiento || ""}
+                    onChange={handleChange}
+                    placeholder="Ej: 512GB SSD NVMe"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="pantalla">
+                    <div className="flex items-center gap-1.5">
+                      <Monitor className="w-4 h-4 text-indigo-600" /> Pantalla
+                    </div>
+                  </Label>
+                  <Input
+                    id="pantalla"
+                    name="pantalla"
+                    value={producto.pantalla || ""}
+                    onChange={handleChange}
+                    placeholder="Ej: 15.6 pulgadas FHD IPS"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="peso">
+                    <div className="flex items-center gap-1.5">
+                      <Weight className="w-4 h-4 text-gray-600" /> Peso
+                    </div>
+                  </Label>
+                  <Input
+                    id="peso"
+                    name="peso"
+                    value={producto.peso || ""}
+                    onChange={handleChange}
+                    placeholder="Ej: 1.8 kg"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="batería">
+                    <div className="flex items-center gap-1.5">
+                      <Battery className="w-4 h-4 text-green-600" /> Batería
+                    </div>
+                  </Label>
+                  <Input
+                    id="batería"
+                    name="batería"
+                    value={producto.batería || ""}
+                    onChange={handleChange}
+                    placeholder="Ej: 6 celdas, 72Wh"
+                    required
+                  />
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Puertos y conectividad */}
+            <motion.div variants={itemVariants} className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Usb className="w-5 h-5 text-blue-500" />
+                <h3 className="text-lg font-semibold">
+                  Puertos y Conectividad
+                </h3>
+              </div>
+              <Separator />
+
+              <div className="space-y-3">
+                <Label>Selecciona los puertos disponibles</Label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+                  {PUERTOS_OPTIONS.map((puerto) => {
+                    const isSelected = (producto.puertos || []).includes(
+                      puerto.value
+                    );
+                    return (
+                      <motion.div
+                        key={puerto.value}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => handlePuertosChange(puerto.value)}
+                        className={`cursor-pointer transition-all duration-200 ${
+                          isSelected ? "scale-105" : ""
+                        }`}
+                      >
+                        <Badge
+                          variant={isSelected ? "default" : "outline"}
+                          className={`w-full py-3 justify-center text-sm font-medium ${
+                            isSelected
+                              ? "bg-amber-500 hover:bg-amber-600 text-white"
+                              : "hover:bg-amber-50 dark:hover:bg-amber-950"
+                          }`}
+                        >
+                          <div className="flex items-center">
+                            {puerto.icon}
+                            {puerto.value}
+                          </div>
+                        </Badge>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Botón de envío */}
+            <motion.div variants={itemVariants} className="pt-4">
+              <motion.div
+                variants={buttonVariants}
+                initial="initial"
+                whileTap="tap"
+              >
+                <Button
+                  type="submit"
+                  className="w-full py-6 text-lg font-medium bg-amber-500 hover:bg-amber-600 rounded-lg"
+                  disabled={isPending}
+                >
+                  {isPending ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin w-5 h-5 border-2 border-current border-t-transparent rounded-full" />
+                      <span>Creando producto...</span>
+                    </div>
+                  ) : (
+                    <span>Crear Producto</span>
+                  )}
+                </Button>
+              </motion.div>
+            </motion.div>
+          </motion.form>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 };

@@ -12,6 +12,7 @@ export interface LaptopsType {
   inStock: boolean;
   tipo: string;
   image: string;
+  imageURL: string | null;
 }
 
 export interface LaptopsResponse {
